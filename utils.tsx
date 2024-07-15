@@ -10,6 +10,7 @@ import { ChannelStore, FluxDispatcher, Toasts } from "@webpack/common";
 import { Message } from "discord-types/general";
 
 import { Member, MemberGuildSettings, PKAPI, System, SystemGuildSettings } from "./pkapi.js/lib";
+import { findByCode } from "@webpack";
 
 
 // I dont fully understand how to use datastores, if I used anything incorrectly please let me know
@@ -46,7 +47,7 @@ export function replaceTags(content: string, message: Message, localSystemData: 
 
     // prioritize guild settings, then system/member settings
     const { tag } = systemSettings??system;
-    const name = memberSettings ? memberSettings.display_name : author.member.display_name??author.member.name;
+    const name = memberSettings.display_name || (author.member.display_name??author.member.name);
     const avatar = memberSettings ? memberSettings.avatar_url : author.member.avatar;
 
     return content
@@ -80,6 +81,11 @@ export function replyToMessage(msg: Message, mention: boolean, hideMention: bool
 }
 
 export function deleteMessage(msg: Message) {
+    const { addReaction } = findByCode(".userHasReactedWithEmoji");
+
+    addReaction(msg.channel_id, msg.id, { name: "❌" });
+
+    /*
     // todo: fix
     FluxDispatcher.dispatch({
         type: "MESSAGE_REACTION_ADD",
@@ -93,7 +99,7 @@ export function deleteMessage(msg: Message) {
         options: {
             duration: 3000
         }
-    });
+    });*/
 }
 
 export function generateAuthorData(message: Message) {
