@@ -25,20 +25,18 @@ import {
     Button,
     ChannelStore,
     MessageActions,
-    MessageStore,
-    UserStore
+    MessageStore, UserStore
 } from "@webpack/common";
 import { Message } from "discord-types/general";
 
-import { Member, PKAPI } from "./api";
+import { PKAPI } from "./api";
 import pluralKit from "./index";
 import {
-    Author,
     deleteMessage,
     getAuthorOfMessage,
     isOwnPkMessage,
     isPk,
-    loadAuthors,
+    loadAuthors, loadData,
     replaceTags,
 } from "./utils";
 
@@ -70,22 +68,7 @@ export const settings = definePluginSettings({
         type: OptionType.COMPONENT,
         component: () => {
             return <Button label={"Load"} onClick = {async () => {
-                const system = await pluralKit.api.getSystem({ system: UserStore.getCurrentUser().id });
-                const localSystem: Author[] = [];
-
-                (system.members??(await system.getMembers())).forEach((member: Member) => {
-                    localSystem.push({
-                        messageIds: [],
-                        member,
-                        system,
-                        guildSettings: new Map(),
-                        systemSettings: new Map()
-                    });
-                });
-
-                settings.store.data = JSON.stringify(localSystem);
-
-                await loadAuthors();
+                await loadData();
             }}>LOAD</Button>;
         },
         description: "Load local system into memory"
@@ -118,6 +101,13 @@ export default definePlugin({
     startAt: StartAt.WebpackReady,
     settings,
     patches: [
+        {
+            find: '?"@":"")',
+            replacement: {
+                match: /(?<=onContextMenu:\i,children:).*?\)}/,
+                replace: "$self.renderUsername(arguments[0])}"
+            }
+        },
         // make up arrow to edit most recent message work
         // this might conflict with messageLogger, but to be honest, if you're
         // using that plugin, you'll have enough problems with pk already
@@ -163,7 +153,9 @@ export default definePlugin({
     api: new PKAPI({}),
 
     async start() {
-        await loadAuthors();
+        await loadData();
+        if (settings.store.data === "{}")
+            await loadAuthors();
 
         addButton("pk-edit", msg => {
             if (!msg) return null;

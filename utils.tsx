@@ -7,11 +7,11 @@
 import { DataStore } from "@api/index";
 import { insertTextIntoChatInputBox } from "@utils/discord";
 import { findByCode } from "@webpack";
-import { ChannelStore, FluxDispatcher } from "@webpack/common";
+import { ChannelStore, FluxDispatcher, UserStore } from "@webpack/common";
 import { Message } from "discord-types/general";
 
 import { Member, MemberGuildSettings, PKAPI, System, SystemGuildSettings } from "./api";
-import { settings } from "./index";
+import pluralKit, { settings } from "./index";
 
 
 // I dont fully understand how to use datastores, if I used anything incorrectly please let me know
@@ -69,8 +69,31 @@ export function replaceTags(content: string, message: Message, localSystemData: 
 
 export async function loadAuthors() {
     authors = await DataStore.get<Record<string, Author>>(DATASTORE_KEY) ?? {};
-    localSystem = JSON.parse(localSystemJson = settings.store.data) ?? [];
+    localSystem = JSON.parse(localSystemJson = settings.store.data) ?? {};
     localSystemNames = localSystem.map(author => author.member.display_name??author.member.name);
+}
+
+export async function loadData() {
+    const system = await pluralKit.api.getSystem({ system: UserStore.getCurrentUser().id });
+    if (!system) {
+        settings.store.data = "{}";
+        return;
+    }
+    const localSystem: Author[] = [];
+
+    (system.members??(await system.getMembers())).forEach((member: Member) => {
+        localSystem.push({
+            messageIds: [],
+            member,
+            system,
+            guildSettings: new Map(),
+            systemSettings: new Map()
+        });
+    });
+
+    settings.store.data = JSON.stringify(localSystem);
+
+    await loadAuthors();
 }
 
 export function replyToMessage(msg: Message, mention: boolean, hideMention: boolean, content?: string | undefined) {
