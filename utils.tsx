@@ -51,7 +51,7 @@ export function replaceTags(content: string, message: Message, localSystemData: 
 
     // prioritize guild settings, then system/member settings
     const { tag } = systemSettings??system;
-    const name = memberSettings.display_name || (author.member.display_name??author.member.name);
+    const name = memberSettings?.display_name || (author.member.display_name??author.member.name);
     const avatar = memberSettings ? memberSettings.avatar_url : author.member.avatar;
 
     return content
@@ -132,11 +132,12 @@ export function getAuthorOfMessage(message: Message, pk: PKAPI) {
 
     pk.getMessage({ message: message.id }).then(msg => {
         author = ({ messageIds: [msg.id], member: msg.member as Member, system: msg.system as System, systemSettings: new Map(), guildSettings: new Map() });
-        author.member.getGuildSettings(ChannelStore.getChannel(msg.channel).guild_id).then(guildSettings => {
+
+        author.member.getGuildSettings(ChannelStore.getChannel(msg.channel).guild_id)?.then(guildSettings => {
             author.guildSettings?.set(ChannelStore.getChannel(msg.channel).guild_id, guildSettings);
         });
 
-        author.system.getGuildSettings(ChannelStore.getChannel(msg.channel).guild_id).then(guildSettings => {
+        author.system.getGuildSettings(ChannelStore.getChannel(msg.channel).guild_id)?.then(guildSettings => {
             author.systemSettings?.set(ChannelStore.getChannel(msg.channel).guild_id, guildSettings);
         });
 
