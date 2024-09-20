@@ -34,15 +34,15 @@ export function isPk(msg: Message) {
     return (msg && msg.applicationId === "466378653216014359");
 }
 
-export function isOwnPkMessage(message: Message): boolean {
+export function isOwnPkMessage(message: Message, pk: PKAPI): boolean {
     if (!isPk(message)) return false;
     if (["[]", "{}", undefined].includes(localSystemJson)) return false;
 
-    return (localSystem??[]).map(author => author.member.id).some(id => id === getAuthorOfMessage(message, new PKAPI()).member.id);
+    return (localSystem??[]).map(author => author.member.id).some(id => id === getAuthorOfMessage(message, pk).member.id);
 }
 
-export function replaceTags(content: string, message: Message, localSystemData: string) {
-    const author = getAuthorOfMessage(message, new PKAPI());
+export function replaceTags(content: string, message: Message, localSystemData: string, pk: PKAPI) {
+    const author = getAuthorOfMessage(message, pk);
     const localSystem: Author[] = JSON.parse(localSystemData);
 
     const systemSettings: SystemGuildSettings = author.systemSettings[ChannelStore.getChannel(message.channel_id).guild_id];

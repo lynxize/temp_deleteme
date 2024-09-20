@@ -121,12 +121,12 @@ export default definePlugin({
             find: "getLastEditableMessage",
             replacement: {
                 match: /return (.)\(\)\(this.getMessages\((.)\).{10,100}:.\.id\)/,
-                replace: "return $1()(this.getMessages($2).toArray()).reverse().find(msg => $self.isOwnMessage(msg)"
+                replace: "return $1()(this.getMessages($2).toArray()).reverse().find(msg => $self.isOwnMessage(msg, pluralKit.api)"
             }
         },
     ],
 
-    isOwnMessage: (message: Message) => isOwnPkMessage(message) || message.author.id === UserStore.getCurrentUser().id,
+    isOwnMessage: (message: Message) => isOwnPkMessage(message, pluralKit.api) || message.author.id === UserStore.getCurrentUser().id,
 
     renderUsername: ({ author, message, isRepliedMessage, withMentionPrefix }) => {
         const prefix = isRepliedMessage && withMentionPrefix ? "@" : "";
@@ -144,7 +144,7 @@ export default definePlugin({
                 color = pkAuthor.member.color??color;
             }
 
-            const display = isOwnPkMessage(message) && settings.store.displayLocal !== "" ? settings.store.displayLocal : settings.store.displayOther;
+            const display = isOwnPkMessage(message, pluralKit.api) && settings.store.displayLocal !== "" ? settings.store.displayLocal : settings.store.displayOther;
             const resultText = replaceTags(display, message, settings.store.data);
 
             return <span style={{
@@ -164,7 +164,7 @@ export default definePlugin({
 
         addButton("pk-edit", msg => {
             if (!msg) return null;
-            if (!isOwnPkMessage(msg)) return null;
+            if (!isOwnPkMessage(msg, pluralKit.api)) return null;
 
             return {
                 label: "Edit",
@@ -180,7 +180,7 @@ export default definePlugin({
 
         addButton("pk-delete", msg => {
             if (!msg) return null;
-            if (!isOwnPkMessage(msg)) return null;
+            if (!isOwnPkMessage(msg, pluralKit.api)) return null;
 
             return {
                 label: "Delete",
