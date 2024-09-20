@@ -171,21 +171,25 @@ export default definePlugin({
                 return <>{prefix}{discordUsername}</>;
             }
 
-
             let color: string = "666666";
             const pkAuthor = getAuthorOfMessage(message, pluralKit.api);
 
             if (pkAuthor.member && settings.store.colorNames) {
-                color = pkAuthor.member.color??color;
+                color = pkAuthor.member.color ?? color;
             }
 
             const display = isOwnPkMessage(message, pluralKit.api) && settings.store.displayLocal !== "" ? settings.store.displayLocal : settings.store.displayOther;
             const resultText = replaceTags(display, message, settings.store.data);
 
+            // PK mesasage, disable bot tag
+            message.bot = false;
+            message.author.bot = false;
+
             return <span style={{
                 color: `#${color}`,
-            }}>{resultText}</span>;
-        } catch {
+            }}>{resultText} <img src="https://pluralkit.me/favicon.png" alt="Proxied by PluralKit" height="14"/></span>;
+        } catch (e) {
+            console.error(e);
             return <>{prefix}{author?.nick}</>;
         }
     },
