@@ -83,14 +83,14 @@ class PKAPI {
     #inst;
     #_base: string = "https://api.pluralkit.me";
     #_version: number = 2;
-    #debug: boolean = true;
+    #debug: boolean = false;
 
     #version_warning = false;
 
     constructor(data?: APIData) {
         this.#_base = (data?.base_url ?? "https://api.pluralkit.me");
         this.#_version = (data?.version ?? 2);
-        this.#debug = (data?.debug !== undefined ? data.debug : true);
+        this.#debug = data?.debug ?? false;
 
         this.#inst = rateLimit(axios.create({
             validateStatus: s => s < 300 && s > 100,
