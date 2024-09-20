@@ -84,6 +84,11 @@ export const settings = definePluginSettings({
         description: "Display member colors in their names in chat",
         default: false
     },
+    pkIcon: {
+        type: OptionType.BOOLEAN,
+        description: "Enables a PluralKit icon next to proxied messages",
+        default: false
+    },
     displayOther: {
         type: OptionType.STRING,
         description: "How to display proxied users (from other systems) in chat\n" +
@@ -185,9 +190,14 @@ export default definePlugin({
             message.bot = false;
             message.author.bot = false;
 
-            return <span style={{
-                color: `#${color}`,
-            }}>{resultText} <img src="https://pluralkit.me/favicon.png" alt="Proxied by PluralKit" height="14"/></span>;
+            if (settings.store.pkIcon) {
+                return <span style={{
+                    color: `#${color}`,
+                }}>{resultText} <img src="https://pluralkit.me/favicon.png" alt="Proxied by PluralKit" height="14"/></span>;
+            } else {
+                return <span style={{color: `#${color}`,
+                }}>{resultText}</span>;
+            }
         } catch (e) {
             console.error(e);
             return <>{prefix}{author?.nick}</>;
