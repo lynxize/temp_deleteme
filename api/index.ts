@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 import axios from "axios";
+import rateLimit from 'axios-rate-limit'
 
 import ROUTES from "./routes";
 import APIError from "./structures/apiError";
@@ -82,7 +83,6 @@ class PKAPI {
     #inst;
     #_base: string = "https://api.pluralkit.me";
     #_version: number = 2;
-    #user_agent: string = "PKAPI.js/5.x";
     #debug: boolean = true;
 
     #version_warning = false;
@@ -91,16 +91,12 @@ class PKAPI {
         this.#_base = (data?.base_url ?? "https://api.pluralkit.me");
         this.#_version = (data?.version ?? 2);
         this.#token = data?.token;
-        this.#user_agent = (data?.user_agent ?? "PKAPI.js/5.x");
         this.#debug = (data?.debug !== undefined ? data.debug : true);
 
-        this.#inst = axios.create({
+        this.#inst = rateLimit(axios.create({
             validateStatus: s => s < 300 && s > 100,
             baseURL: `${this.#_base}/v${this.#_version}`,
-            headers: {
-                "User-Agent": this.#user_agent
-            }
-        });
+        }), { maxRequests: 10, perMilliseconds: 1000, maxRPS: 10 });
     }
 
     /*
@@ -966,14 +962,6 @@ class PKAPI {
     get token() {
         return this.#token;
     }
-
-    get user_agent() {
-        return this.#user_agent;
-    }
-
-    set user_agent(s) {
-        this.#user_agent = s;
-        this.#inst.defaults.headers["User-Agent"] = s;
     }
 
     get debug() {
