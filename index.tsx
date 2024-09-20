@@ -161,7 +161,7 @@ export default definePlugin({
             find: "getLastEditableMessage",
             replacement: {
                 match: /return (.)\(\)\(this.getMessages\((.)\).{10,100}:.\.id\)/,
-                replace: "return $1()(this.getMessages($2).toArray()).reverse().find(msg => $self.isOwnMessage(msg, pluralKit.api)"
+                replace: "return $1()(this.getMessages($2).toArray()).reverse().find(msg => $self.isOwnMessage(msg)"
             }
         },
     ],
