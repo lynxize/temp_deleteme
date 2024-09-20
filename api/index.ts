@@ -195,7 +195,7 @@ class PKAPI {
         try {
             var resp = await this.handle(ROUTES[this.#_version].GET_SYSTEM_GUILD_SETTINGS(data.guild), { token });
         } catch(e) {
-            throw e;
+            return undefined
         }
 
         return new SystemGuildSettings(this, { ...resp.data, guild: data.guild });
@@ -450,7 +450,7 @@ class PKAPI {
                 { token }
             );
         } catch(e) {
-            throw e;
+            return undefined;
         }
 
         return new MemberGuildSettings(this, { ...resp.data, guild: data.guild, member: data.member });
@@ -930,7 +930,7 @@ class PKAPI {
             var resp = await this.#inst(route, request);
         } catch(e: any) {
             if(this.#debug) console.log(e);
-            throw new APIError(this, e.response);
+            return e.response;
         }
 
         return resp;
