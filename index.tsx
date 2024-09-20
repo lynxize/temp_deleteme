@@ -73,6 +73,11 @@ export const settings = definePluginSettings({
         },
         description: "Load local system into memory"
     },
+    token: {
+        type: OptionType.STRING,
+        description: "Your PluralKit Token, required for many actions",
+        default: ""
+    },
     printData: {
         type: OptionType.COMPONENT,
         component: () => {

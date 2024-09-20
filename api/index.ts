@@ -46,6 +46,7 @@ import System, { ISystem } from "./structures/system";
 import SystemAutoproxySettings, { ISystemAutoproxySettings } from "./structures/systemAutoproxySettings";
 import SystemConfig, { ISystemConfig } from "./structures/systemConfig";
 import SystemGuildSettings, { ISystemGuildSettings } from "./structures/systemGuildSettings";
+import { settings } from "../"
 
 export interface APIData {
 	base_url?: string;
@@ -79,7 +80,6 @@ export type RequestData<T extends {}> = T & {
 }
 
 class PKAPI {
-    #token?: string;
     #inst;
     #_base: string = "https://api.pluralkit.me";
     #_version: number = 2;
@@ -90,7 +90,6 @@ class PKAPI {
     constructor(data?: APIData) {
         this.#_base = (data?.base_url ?? "https://api.pluralkit.me");
         this.#_version = (data?.version ?? 2);
-        this.#token = data?.token;
         this.#debug = (data?.debug !== undefined ? data.debug : true);
 
         this.#inst = rateLimit(axios.create({
@@ -104,7 +103,7 @@ class PKAPI {
 	*/
 
     async getSystem(data: GetSystemOptions = { }) {
-        const token = this.#token ?? data.token;
+        const token = settings.store.token ?? data.token;
         if(data.system == null && !token) throw new Error("Must provide a token or ID.");
         let sys: System;
         let resp: { data: Partial<System>; };
@@ -137,7 +136,7 @@ class PKAPI {
     }
 
     async patchSystem(data: System | Partial<System> = {}) {
-        var token = this.#token ?? data.token;
+        var token = settings.store.token ?? data.token;
         if(!token) throw new Error("PATCH requires a token.");
 
         try {
@@ -154,7 +153,7 @@ class PKAPI {
     async getSystemConfig(data: RequestOptions = {}) {
         if(this.version < 2) throw new Error("System settings are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("Getting system settings requires a token.");
 
         try {
@@ -169,7 +168,7 @@ class PKAPI {
     async patchSystemConfig(data: RequestData<ISystemConfig>) {
         if(this.version < 2) throw new Error("System settings are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("PATCH requires a token.");
 
         try {
@@ -189,7 +188,7 @@ class PKAPI {
     async getSystemGuildSettings(data: { token?: string, guild: string }) {
         if(this.version < 2) throw new Error("Guild settings are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("Getting guild settings requires a token.");
         if(!data.guild) throw new Error("Must provide a guild ID.");
 
@@ -205,7 +204,7 @@ class PKAPI {
     async patchSystemGuildSettings(data: RequestData<ISystemGuildSettings>) {
         if(this.version < 2) throw new Error("Guild settings are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("PATCH requires a token.");
         if(!data.guild) throw new Error("Must provide a guild ID.");
 
@@ -226,7 +225,7 @@ class PKAPI {
     async getSystemAutoproxySettings(data: { token?: string, guild: string }) {
         if(this.version < 2) throw new Error("Autoproxy settings are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("Getting autoproxy settings requires a token.");
         if(!data.guild) throw new Error("Must provide a guild ID.");
 
@@ -242,7 +241,7 @@ class PKAPI {
     async patchSystemAutoproxySettings(data: RequestData<ISystemAutoproxySettings>) {
         if(this.version < 2) throw new Error("Autoproxy settings are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("PATCH requires a token.");
         if(!data.guild) throw new Error("Must provide a guild ID.");
 
@@ -265,7 +264,7 @@ class PKAPI {
 	*/
 
     async createMember(data: RequestData<Partial<IMember>>) {
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("POST requires a token.");
 
         try {
@@ -280,7 +279,7 @@ class PKAPI {
     }
 
     async getMember(data: { token?: string, member: string }) {
-        const token = this.#token || data.token;
+        const token = settings.store.token || data.token;
         const resp = await this.handle(ROUTES[this.#_version].GET_MEMBER(data.member), { token });
         if(data.member == null) throw new Error("Must provide a member ID.");
         try {
@@ -292,7 +291,7 @@ class PKAPI {
     }
 
     async getMembers(data: { token?: string, system: string }) {
-        const token = this.#token || data.token;
+        const token = settings.store.token || data.token;
         const system = data.system ?? "@me";
         try {
             var resp = await this.handle(ROUTES[this.#_version].GET_MEMBERS(system), { token });
@@ -306,7 +305,7 @@ class PKAPI {
 
     async patchMember(data: RequestData<Partial<IMember> & { member: string }>) {
         if(data.member == null) throw new Error("Must provide a member ID.");
-        const token = this.#token || data.token;
+        const token = settings.store.token || data.token;
         if(!token) throw new Error("PATCH requires a token.");
 
         try {
@@ -322,7 +321,7 @@ class PKAPI {
 
     async deleteMember(data: { token?: string, member: string }) {
         if(data.member == null) throw new Error("Must provide a member ID.");
-        const token = this.#token || data.token;
+        const token = settings.store.token || data.token;
         if(!token) throw new Error("DELETE requires a token.");
         try {
             const resp = await this.handle(ROUTES[this.#_version].DELETE_MEMBER(data.member), { token });
@@ -334,7 +333,7 @@ class PKAPI {
     }
 
     async getMemberGroups(data: { token?: string, member: string }) {
-        const token = this.#token || data.token;
+        const token = settings.store.token || data.token;
         const resp = await this.handle(
             ROUTES[this.#_version].GET_MEMBER_GROUPS(data.member),
             { token }
@@ -359,7 +358,7 @@ class PKAPI {
 	}) {
         if(this.version < 2) throw new Error("Groups are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("POST requires a token.");
         if(!data.member) throw new Error("Must provide a member ID.");
         if(!data.groups || !Array.isArray(data.groups))
@@ -386,7 +385,7 @@ class PKAPI {
 	}) {
         if(this.version < 2) throw new Error("Groups are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("POST requires a token.");
         if(!data.member) throw new Error("Must provide a member ID.");
         if(!data.groups || !Array.isArray(data.groups))
@@ -413,7 +412,7 @@ class PKAPI {
 	}) {
         if(this.version < 2) throw new Error("Groups are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("POST requires a token.");
         if(!data.member) throw new Error("Must provide a member ID.");
         if(!data.groups || !Array.isArray(data.groups))
@@ -440,7 +439,7 @@ class PKAPI {
 	}) {
         if(this.version < 2) throw new Error("Guild settings are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("Getting guild settings requires a token.");
         if(!data.member) throw new Error("Must provide a member ID.");
         if(!data.guild) throw new Error("Must provide a guild ID.");
@@ -460,7 +459,7 @@ class PKAPI {
     async patchMemberGuildSettings(data: RequestData<Partial<IMemberGuildSettings>>) {
         if(this.version < 2) throw new Error("Guild settings are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("Getting guild settings requires a token.");
         if(!data.member) throw new Error("Must provide a member ID.");
         if(!data.guild) throw new Error("Must provide a guild ID.");
@@ -486,7 +485,7 @@ class PKAPI {
     async createGroup(data: RequestData<Partial<IGroup>>) {
         if(this.version < 2) throw new Error("Groups are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("POST requires a token.");
 
         try {
@@ -503,7 +502,7 @@ class PKAPI {
     async getGroups(data: { token?: string, system?: string, with_members?: boolean, raw?: boolean }) {
         if(this.version < 2) throw new Error("Groups are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         var system = data.system ?? "@me";
         var with_members = data.with_members ?? false;
 
@@ -540,7 +539,7 @@ class PKAPI {
 	}) {
         if(this.version < 2) throw new Error("Groups are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!data.group) throw new Error("Must provide group ID.");
 
         try {
@@ -559,7 +558,7 @@ class PKAPI {
         if(this.version < 2) throw new Error("Groups are only available for API version 2.");
 
         if(data.group == null) throw new Error("Must provide a group ID.");
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("PATCH requires a token.");
 
         try {
@@ -577,7 +576,7 @@ class PKAPI {
         if(this.version < 2) throw new Error("Groups are only available for API version 2.");
 
         if(data.group == null) throw new Error("Must provide a group ID.");
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("DELETE requires a token.");
 
         try {
@@ -592,7 +591,7 @@ class PKAPI {
     async getGroupMembers(data: { token?: string, group: string }) {
         if(this.version < 2) throw new Error("Groups are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!data.group) throw new Error("Must provide a group ID.");
 
         try {
@@ -612,7 +611,7 @@ class PKAPI {
 	}) {
         if(this.version < 2) throw new Error("Groups are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("POST requires a token.");
         if(!data.group) throw new Error("Must provide a group ID.");
         if(!data.members || !Array.isArray(data.members))
@@ -639,7 +638,7 @@ class PKAPI {
 	}) {
         if(this.version < 2) throw new Error("Groups are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("POST requires a token.");
         if(!data.group) throw new Error("Must provide a group ID.");
         if(!data.members || !Array.isArray(data.members))
@@ -666,7 +665,7 @@ class PKAPI {
 	}) {
         if(this.version < 2) throw new Error("Groups are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("POST requires a token.");
         if(!data.group) throw new Error("Must provide a group ID.");
         if(!data.members || !Array.isArray(data.members))
@@ -691,7 +690,7 @@ class PKAPI {
 	*/
 
     async createSwitch(data: RequestData<Partial<ISwitch>>) {
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("POST requires a token.");
 
         var body: {
@@ -727,7 +726,7 @@ class PKAPI {
 		limit?: number,
 	}) {
         var system = data.system ?? "@me";
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         var { before, limit } = data;
         let switches: Switch[] = [];
         try {
@@ -761,7 +760,7 @@ class PKAPI {
 	}) {
         if(this.version < 2) throw new Error("Individual switches are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         var system = data.system ?? "@me";
         if(!data.switch) throw new Error("Must provide a switch ID.");
 
@@ -781,7 +780,7 @@ class PKAPI {
 		token?: string,
 		system?: string
 	}) {
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         var system = data.system ?? "@me";
         try {
             var resp = await this.handle(ROUTES[this.#_version].GET_FRONTERS(system), { token });
@@ -804,7 +803,7 @@ class PKAPI {
 	}) {
         if(this.version < 2) throw new Error("Individual switches are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("PATCH requires a token.");
         if(!data.switch) throw new Error("Must provide a switch ID.");
         if(!data.timestamp) throw new Error("Must provide a timestamp.");
@@ -831,7 +830,7 @@ class PKAPI {
 	}) {
         if(this.version < 2) throw new Error("Individual switches are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("PATCH requires a token.");
         if(!data.switch) throw new Error("Must provide a switch ID.");
 
@@ -861,7 +860,7 @@ class PKAPI {
 	}) {
         if(this.version < 2) throw new Error("Individual switches are only available for API version 2.");
 
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         if(!token) throw new Error("DELETE requires a token.");
         if(!data.switch) throw new Error("Must provide a switch ID.");
 
@@ -883,7 +882,7 @@ class PKAPI {
 		message: string
 	}) {
         if(data.message == null) throw new Error("Must provide a message ID.");
-        var token = this.#token || data.token;
+        var token = settings.store.token || data.token;
         try {
             var resp = await this.handle(ROUTES[this.#_version].GET_MESSAGE(data.message), { token });
         } catch(e) {
@@ -909,7 +908,7 @@ class PKAPI {
 			headers?: any,
 			data?: any
 		} = { method, headers };
-        var token = this.#token || options?.token;
+        var token = settings.store.token || options?.token;
         if(token) request.headers.Authorization = token;
 
         if(options?.body) {
@@ -956,12 +955,11 @@ class PKAPI {
     }
 
     set token(t) {
-        this.#token = t;
+        settings.store.token = t;
     }
 
     get token() {
-        return this.#token;
-    }
+        return settings.store.token;
     }
 
     get debug() {
