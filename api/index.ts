@@ -80,7 +80,9 @@ export type RequestData<T extends {}> = T & {
 }
 
 class PKAPI {
-    #inst;
+    #inst_message;
+    #inst_get;
+    #inst_post_patch;
     #_base: string = "https://api.pluralkit.me";
     #_version: number = 2;
     #debug: boolean = false;
@@ -92,7 +94,15 @@ class PKAPI {
         this.#_version = (data?.version ?? 2);
         this.#debug = data?.debug ?? false;
 
-        this.#inst = rateLimit(axios.create({
+        this.#inst_message = rateLimit(axios.create({
+            validateStatus: s => s < 300 && s > 100,
+            baseURL: `${this.#_base}/v${this.#_version}`,
+        }), { maxRequests: 9, perMilliseconds: 1000, maxRPS: 9 });
+        this.#inst_get = rateLimit(axios.create({
+            validateStatus: s => s < 300 && s > 100,
+            baseURL: `${this.#_base}/v${this.#_version}`,
+        }), { maxRequests: 9, perMilliseconds: 1000, maxRPS: 9 });
+        this.#inst_post_patch = rateLimit(axios.create({
             validateStatus: s => s < 300 && s > 100,
             baseURL: `${this.#_base}/v${this.#_version}`,
         }), { maxRequests: 3, perMilliseconds: 1000, maxRPS: 3 });
@@ -927,7 +937,13 @@ class PKAPI {
         }
 
         try {
-            var resp = await this.#inst(route, request);
+            var resp = undefined;
+            if (route.substring(1, 9) == "message")
+                resp = await this.#inst_message(route, request);
+            else if (method == "GET")
+                resp = await this.#inst_get(route, request);
+            else
+                resp = await this.#inst_post_patch(route, request);
         } catch(e: any) {
             if(this.#debug) console.log(e);
             return e.response;
@@ -938,7 +954,9 @@ class PKAPI {
 
     set base_url(s) {
         this.#_base = s;
-        this.#inst.defaults.baseURL = `${this.#_base}/v${this.#_version}`;
+        this.#inst_message.defaults.baseURL = `${this.#_base}/v${this.#_version}`;
+        this.#inst_get.defaults.baseURL = `${this.#_base}/v${this.#_version}`;
+        this.#inst_post_patch.defaults.baseURL = `${this.#_base}/v${this.#_version}`;
     }
 
     get base_url() {
@@ -947,7 +965,9 @@ class PKAPI {
 
     set version(n) {
         this.#_version = n;
-        this.#inst.defaults.baseURL = `${this.#_base}/v${this.#_version}`;
+        this.#inst_message.defaults.baseURL = `${this.#_base}/v${this.#_version}`;
+        this.#inst_get.defaults.baseURL = `${this.#_base}/v${this.#_version}`;
+        this.#inst_post_patch.defaults.baseURL = `${this.#_base}/v${this.#_version}`;
     }
 
     get version() {
