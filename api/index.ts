@@ -95,7 +95,7 @@ class PKAPI {
         this.#inst = rateLimit(axios.create({
             validateStatus: s => s < 300 && s > 100,
             baseURL: `${this.#_base}/v${this.#_version}`,
-        }), { maxRequests: 10, perMilliseconds: 1000, maxRPS: 10 });
+        }), { maxRequests: 3, perMilliseconds: 1000, maxRPS: 3 });
     }
 
     /*
