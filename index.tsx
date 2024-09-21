@@ -89,8 +89,7 @@ export const settings = definePluginSettings({
     pkIcon: {
         type: OptionType.BOOLEAN,
         description: "Enables a PluralKit icon next to proxied messages",
-        default: false,
-        restartNeeded: true
+        default: false
     },
     displayOther: {
         type: OptionType.STRING,
@@ -209,6 +208,8 @@ export default definePlugin({
         }
 
         addDecoration("pk-proxied", props => {
+            if (!settings.store.pkIcon)
+                return null;
             if (!isPk(props.message, pluralKit.api))
                 return null;
             return <ErrorBoundary noop>
