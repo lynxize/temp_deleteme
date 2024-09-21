@@ -239,6 +239,7 @@ export default definePlugin({
             if (!isOwnPkMessage(msg, pluralKit.api)) return null;
 
             return {
+                color: "danger",
                 label: "Delete",
                 icon: () => {
                     return <DeleteIcon/>;
