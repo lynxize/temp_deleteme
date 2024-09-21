@@ -204,8 +204,9 @@ export default definePlugin({
 
     async start() {
         await loadData();
-        if (settings.store.data === "{}")
+        if (settings.store.data === "{}") {
             await loadAuthors();
+        }
 
         addDecoration("pk-proxied", props => {
             if (!isPk(props.message, pluralKit.api))

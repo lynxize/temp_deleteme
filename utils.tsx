@@ -50,7 +50,7 @@ export function replaceTags(content: string, message: Message, localSystemData: 
     const { system } = author;
 
     // prioritize guild settings, then system/member settings
-    const { tag } = systemSettings??system;
+    const { tag } = systemSettings ?? system;
     const name = memberSettings?.display_name || (author.member.display_name??author.member.name);
     const avatar = memberSettings ? memberSettings.avatar_url : author.member.avatar;
 
