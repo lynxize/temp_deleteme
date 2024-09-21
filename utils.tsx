@@ -110,7 +110,7 @@ export function replyToMessage(msg: Message, mention: boolean, hideMention: bool
 }
 
 export function deleteMessage(msg: Message) {
-    const { addReaction } = findByCode(".userHasReactedWithEmoji");
+    const addReaction = findByCode(".userHasReactedWithEmoji");
 
     addReaction(msg.channel_id, msg.id, { name: "❌" });
 }
