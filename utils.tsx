@@ -133,6 +133,10 @@ export function getAuthorOfMessage(message: Message, pk: PKAPI) {
     pk.getMessage({ message: message.id }).then(msg => {
         author = ({ messageIds: [msg.id], member: msg.member as Member, system: msg.system as System, systemSettings: new Map(), guildSettings: new Map() });
 
+        if (!author.member) {
+            return undefined;
+        }
+
         author.member.getGuildSettings(ChannelStore.getChannel(msg.channel).guild_id)?.then(guildSettings => {
             author.guildSettings?.set(ChannelStore.getChannel(msg.channel).guild_id, guildSettings);
         });
