@@ -16,9 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import { addDecoration, removeDecoration } from "@api/MessageDecorations";
 import { addPreEditListener } from "@api/MessageEvents";
 import { addButton, removeButton } from "@api/MessagePopover";
 import { definePluginSettings } from "@api/Settings";
+import ErrorBoundary from "@components/ErrorBoundary";
 import { DeleteIcon } from "@components/Icons";
 import definePlugin, { OptionType, StartAt } from "@utils/types";
 import {
@@ -87,7 +89,8 @@ export const settings = definePluginSettings({
     pkIcon: {
         type: OptionType.BOOLEAN,
         description: "Enables a PluralKit icon next to proxied messages",
-        default: false
+        default: false,
+        restartNeeded: true
     },
     displayOther: {
         type: OptionType.STRING,
@@ -190,14 +193,7 @@ export default definePlugin({
             message.bot = false;
             message.author.bot = false;
 
-            if (settings.store.pkIcon) {
-                return <span style={{
-                    color: `#${color}`,
-                }}>{resultText} <img src="https://pluralkit.me/favicon.png" alt="Proxied by PluralKit" height="14"/></span>;
-            } else {
-                return <span style={{color: `#${color}`,
-                }}>{resultText}</span>;
-            }
+            return <span style={{color: `#${color}`}}>{resultText}</span>;
         } catch (e) {
             console.error(e);
             return <>{prefix}{author?.nick}</>;
@@ -210,6 +206,17 @@ export default definePlugin({
         await loadData();
         if (settings.store.data === "{}")
             await loadAuthors();
+
+        addDecoration("pk-proxied", props => {
+            if (!isPk(props.message, pluralKit.api))
+                return null;
+            return <ErrorBoundary noop>
+                <img src="https://pluralkit.me/favicon.png" height="17" style={{
+                    marginLeft: 4,
+                    verticalAlign: "sub"
+                }}/>
+            </ErrorBoundary>;
+        });
 
         addButton("pk-edit", msg => {
             if (!msg) return null;
