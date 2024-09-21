@@ -255,11 +255,10 @@ export default definePlugin({
         this.preEditListener = addPreEditListener((channelId, messageId, messageObj) => {
             if (isPk(MessageStore.getMessage(channelId, messageId))) {
                 const { guild_id } = ChannelStore.getChannel(channelId);
-                MessageActions.sendMessage(channelId, {
-                    reaction: false,
-                    content: "pk;e https://discord.com/channels/" + guild_id + "/" + channelId + "/" + messageId + " " + messageObj.content
-                });
-                // return { cancel: true };
+                MessageActions.sendMessage("1276796961227276338", {
+                        content: "pk;e https://discord.com/channels/" + guild_id + "/" + channelId + "/" + messageId + " " + messageObj.content},
+                    false);
+                //return { cancel: true };
             }
         });
     },
