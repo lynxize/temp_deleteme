@@ -254,8 +254,8 @@ export default definePlugin({
             if (!shiftKey) return null;
 
             return {
-                color: "danger",
                 label: "Delete",
+                dangerous: true,
                 icon: () => {
                     return <DeleteIcon/>;
                 },
