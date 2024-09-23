@@ -22,7 +22,7 @@ import { addPreEditListener } from "@api/MessageEvents";
 import { addButton, removeButton } from "@api/MessagePopover";
 import { definePluginSettings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
-import { DeleteIcon } from "@components/Icons";
+import { DeleteIcon, PencilIcon } from "@components/Icons";
 import definePlugin, { OptionType, StartAt } from "@utils/types";
 import {
     Button,
@@ -44,11 +44,6 @@ import {
     replaceTags,
 } from "./utils";
 
-const EditIcon = () => {
-    return <svg role={"img"} width={"16"} height={"16"} fill={"none"} viewBox={"0 0 24 24"}>
-        <path fill={"currentColor"} d={"m13.96 5.46 4.58 4.58a1 1 0 0 0 1.42 0l1.38-1.38a2 2 0 0 0 0-2.82l-3.18-3.18a2 2 0 0 0-2.82 0l-1.38 1.38a1 1 0 0 0 0 1.42ZM2.11 20.16l.73-4.22a3 3 0 0 1 .83-1.61l7.87-7.87a1 1 0 0 1 1.42 0l4.58 4.58a1 1 0 0 1 0 1.42l-7.87 7.87a3 3 0 0 1-1.6.83l-4.23.73a1.5 1.5 0 0 1-1.73-1.73Z"}></path>
-    </svg>;
-};
 
 const ctxMenuPatch: NavContextMenuPatchCallback = (children, props) => {
     let msg = props["message"]
@@ -58,7 +53,7 @@ const ctxMenuPatch: NavContextMenuPatchCallback = (children, props) => {
     children[3]?.props.children.splice(0, 0,
         <Menu.MenuItem
             id="pk-edit"
-            icon={EditIcon}
+            icon={PencilIcon}
             label={
                 <div className="edit">
                     <div className="edit">Edit Message</div>
@@ -239,7 +234,7 @@ export default definePlugin({
             return {
                 label: "Edit",
                 icon: () => {
-                    return <EditIcon/>;
+                    return <PencilIcon/>;
                 },
                 message: msg,
                 channel: ChannelStore.getChannel(msg.channel_id),
