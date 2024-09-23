@@ -128,7 +128,7 @@ const KEYS: any = {
         err: "Birthday must be a valid date",
         transform: (d: string | Date) => {
             if(!d) return d;
-            var date;
+            var date: Date | null;
             if(!(d instanceof Date)) date = parser.parseDate(d);
             else date = d;
             return formatDate(date!);

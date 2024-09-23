@@ -508,7 +508,7 @@ class PKAPI {
         var system = data.system ?? "@me";
         var with_members = data.with_members ?? false;
 
-        var groups;
+        var groups: Group[] = [];
         try {
             var resp = await this.handle(ROUTES[this.#_version].GET_GROUPS(system, with_members), { token });
             if(with_members && !data.raw) {
@@ -531,7 +531,7 @@ class PKAPI {
 
         if(!with_members || data.raw) groups = resp.data.map((g: IGroup) => new Group(this, g));
 
-        return new Map<string, Group>(groups.map((g: IGroup) => [g.id, g]));
+        return new Map<string, Group>(groups.map((g: Group) => [g.id, g]));
     }
 
     async getGroup(data: {
