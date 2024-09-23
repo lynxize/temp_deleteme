@@ -334,12 +334,10 @@ class PKAPI {
         const token = settings.store.token || data.token;
         if(!token) throw new Error("DELETE requires a token.");
         try {
-            const resp = await this.handle(ROUTES[this.#_version].DELETE_MEMBER(data.member), { token });
+            return await this.handle(ROUTES[this.#_version].DELETE_MEMBER(data.member), { token });
         } catch(e) {
             throw e;
         }
-
-        return null;
     }
 
     async getMemberGroups(data: { token?: string, member: string }) {
@@ -377,15 +375,13 @@ class PKAPI {
         groups = groups.map(g => g instanceof Group ? g.id : g);
 
         try {
-            var resp = await this.handle(
+            return await this.handle(
                 ROUTES[this.#_version].ADD_MEMBER_GROUPS(data.member),
                 { token, body: groups }
             );
         } catch(e) {
             throw e;
         }
-
-        return;
     }
 
     async removeMemberGroups(data: {
@@ -404,15 +400,13 @@ class PKAPI {
         groups = groups.map(g => g instanceof Group ? g.id : g);
 
         try {
-            var resp = await this.handle(
+            return await this.handle(
                 ROUTES[this.#_version].REMOVE_MEMBER_GROUPS(data.member),
                 { token, body: groups }
             );
         } catch(e) {
             throw e;
         }
-
-        return;
     }
 
     async setMemberGroups(data: {
@@ -431,15 +425,13 @@ class PKAPI {
         groups = groups.map(g => g instanceof Group ? g.id : g);
 
         try {
-            var resp = await this.handle(
+            return await this.handle(
                 ROUTES[this.#_version].SET_MEMBER_GROUPS(data.member),
                 { token, body: groups }
             );
         } catch(e) {
             throw e;
         }
-
-        return;
     }
 
     async getMemberGuildSettings(data: {
@@ -630,15 +622,13 @@ class PKAPI {
         members = members.map(m => m instanceof Member ? m.id : m);
 
         try {
-            var resp = await this.handle(
+            return await this.handle(
                 ROUTES[this.#_version].ADD_GROUP_MEMBERS(data.group),
                 { token, body: members }
             );
         } catch(e) {
             throw e;
         }
-
-        return;
     }
 
     async removeGroupMembers(data: {
@@ -657,15 +647,13 @@ class PKAPI {
         members = members.map(m => m instanceof Member ? m.id : m);
 
         try {
-            var resp = await this.handle(
+            return await this.handle(
                 ROUTES[this.#_version].REMOVE_GROUP_MEMBERS(data.group),
                 { token, body: members }
             );
         } catch(e) {
             throw e;
         }
-
-        return;
     }
 
     async setGroupMembers(data: {
@@ -684,15 +672,13 @@ class PKAPI {
         members = members.map(m => m instanceof Member ? m.id : m);
 
         try {
-            var resp = await this.handle(
+            return await this.handle(
                 ROUTES[this.#_version].SET_GROUP_MEMBERS(data.group),
                 { token, body: members }
             );
         } catch(e) {
             throw e;
         }
-
-        return;
     }
 
     /*
