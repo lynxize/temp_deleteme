@@ -198,7 +198,7 @@ export default definePlugin({
             }
 
             const display = isOwnPkMessage(message, pluralKit.api) && settings.store.displayLocal !== "" ? settings.store.displayLocal : settings.store.displayOther;
-            const resultText = replaceTags(display, message, settings.store.data);
+            const resultText = replaceTags(display, message, settings.store.data, pluralKit.api);
 
             // PK mesasage, disable bot tag
             message.bot = false;
@@ -222,7 +222,7 @@ export default definePlugin({
         addDecoration("pk-proxied", props => {
             if (!settings.store.pkIcon)
                 return null;
-            if (!isPk(props.message, pluralKit.api))
+            if (!isPk(props.message))
                 return null;
             return <ErrorBoundary noop>
                 <img src="https://pluralkit.me/favicon.png" height="17" style={{
