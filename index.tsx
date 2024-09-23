@@ -25,6 +25,7 @@ import ErrorBoundary from "@components/ErrorBoundary";
 import { DeleteIcon, PencilIcon } from "@components/Icons";
 import definePlugin, { OptionType, StartAt } from "@utils/types";
 import {
+    Avatar,
     Button,
     ChannelStore,
     Menu,
@@ -41,9 +42,31 @@ import {
     isOwnPkMessage,
     isPk,
     loadAuthors, loadData,
+    localSystem,
     replaceTags,
 } from "./utils";
 
+function GetAuthorMenuItem(author: Author, message: Message) {
+    return (
+        <Menu.MenuItem
+            id={"pk_menu_item_" + author.member.uuid}
+            iconLeft={() =>
+                (<Avatar className="pk-menu-icon" src={author.member.avatar_url ?? author.system.avatar_url ?? "https://pluralkit.me/favicon.png"} size="SIZE_20"/>)
+            }
+            label={
+                <div className="pk-menu-item">
+                    <div className="pk-menu-item">{author.member.display_name}</div>
+                </div>
+            }
+            action={() => {
+                const { guild_id } = ChannelStore.getChannel(message.channel_id);
+                MessageActions.sendMessage(message.channel_id, // Replace with pluralkit's channel ID once reproxying works in DMs: 1276796961227276338
+                                           {content: "pk;reproxy https://discord.com/channels/" + guild_id + "/" + message.channel_id + "/" + message.id + " " + author.member.name},
+                                           false);
+                }
+            }
+        />);
+}
 
 const ctxMenuPatch: NavContextMenuPatchCallback = (children, props) => {
     let msg = props["message"]
@@ -60,6 +83,22 @@ const ctxMenuPatch: NavContextMenuPatchCallback = (children, props) => {
                 </div>
             }
             action={() => MessageActions.startEditMessage(msg.channel_id, msg.id, msg.content)}
+        />
+    );
+
+    var proxyMenuItems = localSystem.map(author => GetAuthorMenuItem(author, msg));
+
+    // Place right after the apps dropdown
+    children[4]?.props.children.splice(4, 0,
+        <Menu.MenuItem
+            id="pk-reproxy"
+            label={
+                <div className="reproxy">
+                    <div className="reproxy">Reproxy As...</div>
+                </div>
+            }
+            listClassName="pk-reproxy-list"
+            children={proxyMenuItems}
         />
     );
 
