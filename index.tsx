@@ -223,10 +223,6 @@ export default definePlugin({
             let color: string = "666666";
             const pkAuthor = getAuthorOfMessage(message, pluralKit.api);
 
-            if (pkAuthor === undefined) {
-                return <>{prefix}{discordUsername}</>
-            }
-
             if (pkAuthor.member && settings.store.colorNames) {
                 color = pkAuthor.member.color ?? color;
             }
