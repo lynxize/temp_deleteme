@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import { NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { addDecoration } from "@api/MessageDecorations";
 import { addPreEditListener } from "@api/MessageEvents";
 import { addButton, removeButton } from "@api/MessagePopover";
