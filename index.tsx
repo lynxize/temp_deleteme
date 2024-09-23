@@ -54,6 +54,7 @@ const ctxMenuPatch: NavContextMenuPatchCallback = (children, props) => {
     let msg = props["message"]
     if (!isOwnPkMessage(msg, pluralKit.api)) return;
 
+    // Place at the beginning of the second menu section
     children[3].props.children.splice(0, 0,
         <Menu.MenuItem
             id="pk-edit"
@@ -67,6 +68,7 @@ const ctxMenuPatch: NavContextMenuPatchCallback = (children, props) => {
         />
     );
 
+    // Override the regular delete button if it's not present
     children[5].props.children[2] =
         <Menu.MenuItem
             id="pk-delete"
