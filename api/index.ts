@@ -205,7 +205,7 @@ class PKAPI {
         try {
             var resp = await this.handle(ROUTES[this.#_version].GET_SYSTEM_GUILD_SETTINGS(data.guild), { token });
         } catch(e) {
-            return undefined
+            throw e;
         }
 
         return new SystemGuildSettings(this, { ...resp.data, guild: data.guild });
@@ -460,7 +460,7 @@ class PKAPI {
                 { token }
             );
         } catch(e) {
-            return undefined;
+            throw e;
         }
 
         return new MemberGuildSettings(this, { ...resp.data, guild: data.guild, member: data.member });
