@@ -48,7 +48,7 @@ import MemberGuildSettings from "./memberGuildSettings";
 
 const parser = chrono.casual.clone();
 parser.refiners.push({
-    refine: (ctx, res) => {
+    refine: (_ctx, res) => {
         res.forEach(r => {
             if(!r.start.isCertain("year")) r.start.assign("year", 2004);
         });
