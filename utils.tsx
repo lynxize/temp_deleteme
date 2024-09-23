@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { AxiosError } from "axios"
 import { DataStore } from "@api/index";
 import { insertTextIntoChatInputBox } from "@utils/discord";
 import { findByCode } from "@webpack";
@@ -131,19 +132,32 @@ export function getAuthorOfMessage(message: Message, pk: PKAPI) {
     }
 
     pk.getMessage({ message: message.id }).then(msg => {
+        if (!msg.member)
+            throw new TypeError("Mesage did not have an associated author!");
+
         author = ({ messageIds: [msg.id], member: msg.member as Member, system: msg.system as System, systemSettings: new Map(), guildSettings: new Map() });
 
-        if (!author.member) {
-            return undefined;
+        try {
+            author.member.getGuildSettings(ChannelStore.getChannel(msg.channel).guild_id).then(guildSettings => {
+                author.guildSettings.set(ChannelStore.getChannel(msg.channel).guild_id, guildSettings);
+            });
+        } catch (e) {
+            if (!(e instanceof AxiosError))
+                throw(e);
+
+            author.guildSettings.set(ChannelStore.getChannel(msg.channl).guild_id, new MemberGuildSettings(pk, {}));
         }
 
-        author.member.getGuildSettings(ChannelStore.getChannel(msg.channel).guild_id)?.then(guildSettings => {
-            author.guildSettings?.set(ChannelStore.getChannel(msg.channel).guild_id, guildSettings);
-        });
+        try {
+            author.system.getGuildSettings(ChannelStore.getChannel(msg.channel).guild_id).then(guildSettings => {
+                author.systemSettings.set(ChannelStore.getChannel(msg.channel).guild_id, guildSettings);
+            });
+        } catch (e) {
+            if (!(e instanceof AxiosError))
+                throw(e);
 
-        author.system.getGuildSettings(ChannelStore.getChannel(msg.channel).guild_id)?.then(guildSettings => {
-            author.systemSettings?.set(ChannelStore.getChannel(msg.channel).guild_id, guildSettings);
-        });
+            author.systemSettings.set(ChannelStore.getChannel(msg.channel).guild_id, new SystemGuildSettings(pk, {}));
+        }
 
         authors[authorData] = author;
         DataStore.set(DATASTORE_KEY, authors);
