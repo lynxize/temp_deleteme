@@ -372,7 +372,7 @@ class PKAPI {
         if(!data.groups || !Array.isArray(data.groups))
             throw new Error("Must provide an array of groups.");
         var { groups } = data;
-        groups = groups.map(g => g instanceof Group ? g.id : g);
+        groups = groups.map((g: Group | string) => g instanceof Group ? g.id : g);
 
         try {
             return await this.handle(
@@ -397,7 +397,7 @@ class PKAPI {
         if(!data.groups || !Array.isArray(data.groups))
             throw new Error("Must provide an array of groups.");
         var { groups } = data;
-        groups = groups.map(g => g instanceof Group ? g.id : g);
+        groups = groups.map((g: Group | string) => g instanceof Group ? g.id : g);
 
         try {
             return await this.handle(
@@ -422,7 +422,7 @@ class PKAPI {
         if(!data.groups || !Array.isArray(data.groups))
             throw new Error("Must provide an array of groups.");
         var { groups } = data;
-        groups = groups.map(g => g instanceof Group ? g.id : g);
+        groups = groups.map((g: Group | string) => g instanceof Group ? g.id : g);
 
         try {
             return await this.handle(
@@ -619,7 +619,7 @@ class PKAPI {
         if(!data.members || !Array.isArray(data.members))
             throw new Error("Must provide an array of members.");
         var { members } = data;
-        members = members.map(m => m instanceof Member ? m.id : m);
+        members = members.map((m: Member | string) => m instanceof Member ? m.id : m);
 
         try {
             return await this.handle(
@@ -644,7 +644,7 @@ class PKAPI {
         if(!data.members || !Array.isArray(data.members))
             throw new Error("Must provide an array of members.");
         var { members } = data;
-        members = members.map(m => m instanceof Member ? m.id : m);
+        members = members.map((m: Member | string) => m instanceof Member ? m.id : m);
 
         try {
             return await this.handle(
@@ -669,7 +669,7 @@ class PKAPI {
         if(!data.members || !Array.isArray(data.members))
             throw new Error("Must provide an array of members.");
         var { members } = data;
-        members = members.map(m => m instanceof Member ? m.id : m);
+        members = members.map((m: Member | string) => m instanceof Member ? m.id : m);
 
         try {
             return await this.handle(
