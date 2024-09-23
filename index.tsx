@@ -251,6 +251,7 @@ export default definePlugin({
         addButton("pk-delete", msg => {
             if (!msg) return null;
             if (!isOwnPkMessage(msg, pluralKit.api)) return null;
+            if (!shiftKey) return null;
 
             return {
                 color: "danger",
@@ -275,11 +276,19 @@ export default definePlugin({
                 //return { cancel: true };
             }
         });
+
+        document.addEventListener("keydown", onKey);
+        document.addEventListener("keyup", onKey);
     },
     stop() {
         removeButton("pk-edit");
         removeButton("pk-delete");
+        document.removeEventListener("keydown", onKey);
+        document.removeEventListener("keyup", onKey);
     },
 });
 
-
+var shiftKey = false;
+function onKey(e: KeyboardEvent) {
+    shiftKey = e.shiftKey;
+}
