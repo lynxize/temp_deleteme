@@ -182,8 +182,8 @@ class PKAPI {
         if(!token) throw new Error("PATCH requires a token.");
 
         try {
-            var settings = data instanceof SystemConfig ? data : new SystemConfig(this, data);
-            var body = await settings.verify();
+            var systemConfig = data instanceof SystemConfig ? data : new SystemConfig(this, data);
+            var body = await systemConfig.verify();
             var resp = await this.handle(
                 ROUTES[this.#_version].PATCH_SYSTEM_CONFIG(),
                 { token, body }
@@ -219,8 +219,8 @@ class PKAPI {
         if(!data.guild) throw new Error("Must provide a guild ID.");
 
         try {
-            var settings = data instanceof SystemGuildSettings ? data : new SystemGuildSettings(this, data);
-            var body = await settings.verify();
+            var systemGuildSettings = data instanceof SystemGuildSettings ? data : new SystemGuildSettings(this, data);
+            var body = await systemGuildSettings.verify();
             var resp = await this.handle(
                 ROUTES[this.#_version].PATCH_SYSTEM_GUILD_SETTINGS(data.guild),
                 { token, body }
@@ -256,8 +256,8 @@ class PKAPI {
         if(!data.guild) throw new Error("Must provide a guild ID.");
 
         try {
-            var settings = data instanceof SystemAutoproxySettings ? data : new SystemAutoproxySettings(this, data);
-            var body = await settings.verify();
+            var systemApSettings = data instanceof SystemAutoproxySettings ? data : new SystemAutoproxySettings(this, data);
+            var body = await systemApSettings.verify();
             var resp = await this.handle(
                 ROUTES[this.#_version].PATCH_SYSTEM_AUTOPROXY_SETTINGS(data.guild),
                 { token, body }
@@ -475,8 +475,8 @@ class PKAPI {
         if(!data.guild) throw new Error("Must provide a guild ID.");
 
         try {
-            var settings = data instanceof MemberGuildSettings ? data : new MemberGuildSettings(this, data);
-            var body = await settings.verify();
+            var memberGuildSettings = data instanceof MemberGuildSettings ? data : new MemberGuildSettings(this, data);
+            var body = await memberGuildSettings.verify();
             var resp = await this.handle(
                 ROUTES[this.#_version].PATCH_MEMBER_GUILD_SETTINGS(data.member, data.guild),
                 { token, body }
