@@ -61,7 +61,7 @@ const ctxMenuPatch: NavContextMenuPatchCallback = (children, props) => {
             icon={EditIcon}
             label={
                 <div className="edit">
-                    <div className="edit">Edit PK Message</div>
+                    <div className="edit">Edit Message</div>
                 </div>
             }
             action={() => MessageActions.startEditMessage(msg.channel_id, msg.id, msg.content)}
@@ -81,7 +81,7 @@ const ctxMenuPatch: NavContextMenuPatchCallback = (children, props) => {
             color="danger"
             label={
                 <div className="delete">
-                    <div className="delete">Delete PK Message</div>
+                    <div className="delete">Delete Message</div>
                 </div>
             }
             action={() => deleteMessage(msg)}
