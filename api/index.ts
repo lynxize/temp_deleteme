@@ -32,7 +32,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 import rateLimit from 'axios-rate-limit'
 
 import ROUTES from "./routes";
@@ -80,9 +80,9 @@ export type RequestData<T extends {}> = T & {
 }
 
 class PKAPI {
-    #inst_message;
-    #inst_get;
-    #inst_post_patch;
+    #inst_message: AxiosInstance;
+    #inst_get: AxiosInstance;
+    #inst_post_patch: AxiosInstance;
     #_base: string = "https://api.pluralkit.me";
     #_version: number = 2;
     #debug: boolean = false;
