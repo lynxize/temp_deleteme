@@ -194,7 +194,7 @@ export default definePlugin({
             find: "renderUserGuildPopout: channel should never be null",
             replacement: {
                 match: /if/,
-                replace: "$self.renderUserGuildPopout(e, t);$&"
+                replace: "$self.renderUserGuildPopout(t);$&"
             }
         },
         {
@@ -217,7 +217,7 @@ export default definePlugin({
         },
     ],
 
-    renderUserGuildPopout: (popoutData, message: Mesage) => {
+    renderUserGuildPopout: (message: Mesage) => {
         if (!isPk(message))
             return;
 
