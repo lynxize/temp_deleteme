@@ -191,6 +191,20 @@ export default definePlugin({
     },
     patches: [
         {
+            find: ".hasAvatarForGuild(null==",
+            replacement: {
+                match: /\i\.pronouns/,
+                replace: "$self.tryGetPkPronouns()??$&"
+            }
+        },
+        {
+            find: ".hasAvatarForGuild(null==",
+            replacement: {
+                match: /return\(0/,
+                replace: "v.bio=$self.tryGetPkBio();$&"
+            }
+        },
+        {
             find: "renderUserGuildPopout: channel should never be null",
             replacement: {
                 match: /if/,
@@ -218,21 +232,32 @@ export default definePlugin({
     ],
 
     renderUserGuildPopout: (message: Mesage) => {
-        if (!isPk(message))
-            return;
+        userPopoutMessage = message;
+    },
 
-        const pkAuthor = getAuthorOfMessage(message, pluralKit.api);
+    tryGetPkPronouns: () => {
+        if (!isPk(userPopoutMessage))
+            return null;
+
+        const pkAuthor = getAuthorOfMessage(userPopoutMessage, pluralKit.api);
 
         if (pkAuthor?.member === undefined)
-            return;
+            return null;
 
+        return pkAuthor.member.pronouns ?? pkAuthor.system.pronouns;
         const bio = pkAuthor.member.description ?? pkAuthor.system.description;
-        const pronouns = pkAuthor.member.pronouns ?? pkAuthor.system.pronouns;
+    },
 
-        const memberProfile = UserProfileStore.getUserProfile(message.author.id);
+    tryGetPkBio: () => {
+        if (!isPk(userPopoutMessage))
+            return "";
 
-        memberProfile.bio = bio;
-        memberProfile.pronouns = pronouns;
+        const pkAuthor = getAuthorOfMessage(userPopoutMessage, pluralKit.api);
+
+        if (pkAuthor?.member === undefined)
+            return "";
+
+        return pkAuthor.member.description ?? pkAuthor.system.description;
     },
 
     isOwnMessage: (message: Message) => isOwnPkMessage(message, pluralKit.api) || message.author.id === UserStore.getCurrentUser().id,
@@ -351,3 +376,5 @@ var shiftKey = false;
 function onKey(e: KeyboardEvent) {
     shiftKey = e.shiftKey;
 }
+
+var userPopoutMessage: Message | null = null;
