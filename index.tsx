@@ -237,7 +237,7 @@ export default definePlugin({
 
     isOwnMessage: (message: Message) => isOwnPkMessage(message, pluralKit.api) || message.author.id === UserStore.getCurrentUser().id,
 
-    renderUsername: ({ author, message, isRepliedMessage, withMentionPrefix }) => {
+    renderUsername: ({ author, decorations, message, isRepliedMessage, withMentionPrefix }) => {
         const prefix = isRepliedMessage && withMentionPrefix ? "@" : "";
         try {
             const discordUsername = author.nick??author.displayName??author.username;
@@ -248,14 +248,18 @@ export default definePlugin({
             let color: string = "666666";
             const pkAuthor = getAuthorOfMessage(message, pluralKit.api);
 
+            if (!pkAuthor)
+                return <>{prefix}{discordUsername}</>;
+
             if (pkAuthor.member && settings.store.colorNames) {
-                color = pkAuthor.member.color ?? color;
+                color = pkAuthor.member.color ?? pkAuthor.system.color ?? color;
             }
 
             const display = isOwnPkMessage(message, pluralKit.api) && settings.store.displayLocal !== "" ? settings.store.displayLocal : settings.store.displayOther;
             const resultText = replaceTags(display, message, settings.store.data, pluralKit.api);
 
             // PK mesasage, disable bot tag
+            decorations[0] = null;
             message.bot = false;
             message.author.bot = false;
 
