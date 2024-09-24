@@ -30,7 +30,7 @@ import {
     ChannelStore,
     Menu,
     MessageActions,
-    MessageStore, UserStore
+    MessageStore, UserProfileStore, UserStore
 } from "@webpack/common";
 import { Message } from "discord-types/general";
 
@@ -191,6 +191,13 @@ export default definePlugin({
     },
     patches: [
         {
+            find: "renderUserGuildPopout: channel should never be null",
+            replacement: {
+                match: /if/,
+                replace: "$self.renderUserGuildPopout(e, t);$&"
+            }
+        },
+        {
             find: '?"@":"")',
             replacement: {
                 match: /(?<=onContextMenu:\i,children:).*?\)}/,
@@ -209,6 +216,24 @@ export default definePlugin({
             }
         },
     ],
+
+    renderUserGuildPopout: (popoutData, message: Mesage) => {
+        if (!isPk(message))
+            return;
+
+        const pkAuthor = getAuthorOfMessage(message, pluralKit.api);
+
+        if (pkAuthor?.member === undefined)
+            return;
+
+        const bio = pkAuthor.member.description ?? pkAuthor.system.description;
+        const pronouns = pkAuthor.member.pronouns ?? pkAuthor.system.pronouns;
+
+        const memberProfile = UserProfileStore.getUserProfile(message.author.id);
+
+        memberProfile.bio = bio;
+        memberProfile.pronouns = pronouns;
+    },
 
     isOwnMessage: (message: Message) => isOwnPkMessage(message, pluralKit.api) || message.author.id === UserStore.getCurrentUser().id,
 
