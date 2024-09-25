@@ -205,6 +205,13 @@ export default definePlugin({
             }
         },
         {
+            find: "type:\"USER_PROFILE_MODAL_OPEN\"",
+            replacement: {
+                match: /let{userId:/,
+                replace: "e.userId=$self.getUserPopoutMessageSender().id;$&"
+            }
+        },
+        {
             find: "renderUserGuildPopout: channel should never be null",
             replacement: {
                 match: /if/,
@@ -231,8 +238,15 @@ export default definePlugin({
         },
     ],
 
-    renderUserGuildPopout: (message: Mesage) => {
+    getUserPopoutMessageSender: () => {
+        return userPopoutMessageSender;
+    },
+
+    renderUserGuildPopout: (message: Message) => {
         userPopoutMessage = message;
+        pluralKit.api.getMessage({ message: message.id }).then(msg => {
+            userPopoutMessageSender = UserStore.getUser(msg.sender);
+        });
     },
 
     tryGetPkPronouns: () => {
@@ -378,3 +392,4 @@ function onKey(e: KeyboardEvent) {
 }
 
 var userPopoutMessage: Message | null = null;
+var userPopoutMessageSender: any = null;
