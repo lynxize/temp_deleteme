@@ -212,6 +212,41 @@ export default definePlugin({
             }
         },
         {
+            find: "getRelationshipType(t.id):",
+            replacement: {
+                match: /user:t/,
+                replace: "user:$self.getUserPopoutMessageSender() ?? t"
+            }
+        },
+        {
+            find: "getRelationshipType(t.id):",
+            replacement: {
+                match: /onClose:t/,
+                replace: "onClose:$self.getUserPopoutMessageSender() ?? t"
+            }
+        },
+        {
+            find: "getRelationshipType(t.id):",
+            replacement: {
+                match: /userId:t.id/,
+                replace: "userId:$self.getUserPopoutMessageSender()?.id ?? t.id"
+            }
+        },
+        {
+            find: "getRelationshipType(t.id):",
+            replacement: {
+                match: /:t\.id/,
+                replace: ":$self.getUserPopoutMessageSender()?.id ?? t.id"
+            }
+        },
+        {
+            find: "getRelationshipType(t.id):",
+            replacement: {
+                match: /getRelationshipType\(t\.id\)/,
+                replace: "getRelationshipType($self.getUserPopoutMessageSender()?.id ?? t.id)"
+            }
+        },
+        {
             find: "renderUserGuildPopout: channel should never be null",
             replacement: {
                 match: /if/,
