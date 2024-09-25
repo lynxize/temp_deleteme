@@ -201,7 +201,7 @@ export default definePlugin({
             find: ".hasAvatarForGuild(null==",
             replacement: {
                 match: /return\(0/,
-                replace: "v.bio=$self.tryGetPkBio();$&"
+                replace: "if(v){v._userProfile.pronouns=$self.tryGetPkPronouns();v._userProfile.bio=$self.tryGetPkBio();v.bio=$self.tryGetPkBio()}$&"
             }
         },
         {
