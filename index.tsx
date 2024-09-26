@@ -278,6 +278,9 @@ export default definePlugin({
     },
 
     renderUserGuildPopout: (message: Message) => {
+        if (message == userPopoutMessage)
+            return;
+
         userPopoutMessage = message;
         pluralKit.api.getMessage({ message: message.id }).then(msg => {
             userPopoutMessageSender = UserStore.getUser(msg.sender);
