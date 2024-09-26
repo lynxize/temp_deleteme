@@ -295,7 +295,6 @@ export default definePlugin({
             return null;
 
         return pkAuthor.member.pronouns ?? pkAuthor.system.pronouns;
-        const bio = pkAuthor.member.description ?? pkAuthor.system.description;
     },
 
     tryGetPkBio: () => {
