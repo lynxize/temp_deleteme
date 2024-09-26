@@ -317,7 +317,7 @@ export default definePlugin({
         const prefix = isRepliedMessage && withMentionPrefix ? "@" : "";
         try {
             const discordUsername = author.nick??author.displayName??author.username;
-            if (!isPk(message)) {
+            if (!isPk(message) || !settings.store.colorNames) {
                 return <>{prefix}{discordUsername}</>;
             }
 
@@ -327,7 +327,7 @@ export default definePlugin({
             if (!pkAuthor)
                 return <>{prefix}{discordUsername}</>;
 
-            if (pkAuthor.member && settings.store.colorNames) {
+            if (pkAuthor.member) {
                 color = pkAuthor.member.color ?? pkAuthor.system.color ?? color;
             }
 
