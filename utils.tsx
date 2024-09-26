@@ -23,7 +23,6 @@ export let localSystemNames: string[] = [];
 export let localSystem: Author[] = [];
 
 export interface Author {
-    messageIds: string[];
     member: Member;
     system: System;
     guildSettings: Map<string, MemberGuildSettings>;
@@ -64,9 +63,7 @@ export function replaceTags(content: string, message: Message, localSystemData: 
         .replace(/{systemid}/g, author.system.id??"")
         .replace(/{systemname}/g, author.system.name??"")
         .replace(/{color}/g, author.member.color??"ffffff")
-        .replace(/{avatar}/g, avatar??"")
-        .replace(/{messagecount}/g, author.messageIds.length.toString()??"")
-        .replace(/{systemmessagecount}/g, localSystem.map(author => author.messageIds.length).reduce((acc, val) => acc + val).toString());
+        .replace(/{avatar}/g, avatar??"");
 }
 
 export async function loadAuthors() {
@@ -85,7 +82,6 @@ export async function loadData() {
 
     (system.members??(await system.getMembers())).forEach((member: Member) => {
         localSystem.push({
-            messageIds: [],
             member,
             system,
             guildSettings: new Map(),
@@ -126,7 +122,6 @@ export function getAuthorOfMessage(message: Message, pk: PKAPI) {
     let author: Author = authors[authorData]??undefined;
 
     if (author) {
-        author.messageIds.push(message.id);
         authors[authorData] = author;
         DataStore.set(DATASTORE_KEY, authors);
         return author;
@@ -136,7 +131,7 @@ export function getAuthorOfMessage(message: Message, pk: PKAPI) {
         if (!msg.member)
             throw new TypeError("Mesage did not have an associated author!");
 
-        author = ({ messageIds: [msg.id], member: msg.member as Member, system: msg.system as System, systemSettings: new Map(), guildSettings: new Map() });
+        author = ({ member: msg.member as Member, system: msg.system as System, systemSettings: new Map(), guildSettings: new Map() });
 
         const messageGuildID = ChannelStore.getChannel(msg.channel).guild_id;
 

@@ -136,13 +136,13 @@ export const settings = definePluginSettings({
     displayOther: {
         type: OptionType.STRING,
         description: "How to display proxied users (from other systems) in chat\n" +
-            "{tag}, {name}, {memberId}, {pronouns}, {systemId}, {systemName}, {color}, {avatar}, {messageCount}, {systemMessageCount} are valid variables (All lowercase)",
+            "{tag}, {name}, {memberId}, {pronouns}, {systemId}, {systemName}, {color}, {avatar}, are valid variables (All lowercase)",
         default: "{name}{tag}",
     },
     displayLocal: {
         type: OptionType.STRING,
         description: "How to display proxied users (from your system, defaults to displayOther if blank) in chat\n" +
-            "{tag}, {name}, {memberId}, {pronouns}, {systemId}, {systemName}, {color}, {avatar}, {messageCount}, {systemMessageCount} are valid variables (All lowercase)",
+            "{tag}, {name}, {memberId}, {pronouns}, {systemId}, {systemName}, {color}, {avatar}, are valid variables (All lowercase)",
         default: "",
     },
     load: {
