@@ -138,26 +138,28 @@ export function getAuthorOfMessage(message: Message, pk: PKAPI) {
 
         author = ({ messageIds: [msg.id], member: msg.member as Member, system: msg.system as System, systemSettings: new Map(), guildSettings: new Map() });
 
+        const messageGuildID = ChannelStore.getChannel(msg.channel).guild_id;
+
         try {
-            author.member.getGuildSettings(ChannelStore.getChannel(msg.channel).guild_id).then(guildSettings => {
-                author.guildSettings.set(ChannelStore.getChannel(msg.channel).guild_id, guildSettings);
+            author.member.getGuildSettings(messageGuildID).then(guildSettings => {
+                author.guildSettings.set(messageGuildID, guildSettings);
             });
         } catch (e) {
             if (!(e instanceof AxiosError))
                 throw(e);
 
-            author.guildSettings.set(ChannelStore.getChannel(msg.channl).guild_id, new MemberGuildSettings(pk, {}));
+            author.guildSettings.set(messageGuildID, new MemberGuildSettings(pk, {}));
         }
 
         try {
-            author.system.getGuildSettings(ChannelStore.getChannel(msg.channel).guild_id).then(guildSettings => {
-                author.systemSettings.set(ChannelStore.getChannel(msg.channel).guild_id, guildSettings);
+            author.system.getGuildSettings(messageGuildID).then(guildSettings => {
+                author.systemSettings.set(messageGuildID, guildSettings);
             });
         } catch (e) {
             if (!(e instanceof AxiosError))
                 throw(e);
 
-            author.systemSettings.set(ChannelStore.getChannel(msg.channel).guild_id, new SystemGuildSettings(pk, {}));
+            author.systemSettings.set(messageGuildID, new SystemGuildSettings(pk, {}));
         }
 
         authors[authorData] = author;
