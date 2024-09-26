@@ -69,8 +69,7 @@ function GetAuthorMenuItem(author: Author, message: Message) {
         />);
 }
 
-const ctxMenuPatch: NavContextMenuPatchCallback = (children, props) => {
-    let msg = props["message"]
+const ctxMenuPatch: NavContextMenuPatchCallback = (children, {msg}) => {
     if (!isOwnPkMessage(msg, pluralKit.api)) return;
 
     // Place at the beginning of the second menu section
