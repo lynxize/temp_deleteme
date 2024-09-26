@@ -20,7 +20,6 @@ export const DATASTORE_KEY = "pk";
 export let authors: Record<string, Author> = {};
 
 export let localSystemNames: string[] = [];
-export let localSystemJson: string = "";
 export let localSystem: Author[] = [];
 
 export interface Author {
@@ -37,7 +36,7 @@ export function isPk(msg: Message) {
 
 export function isOwnPkMessage(message: Message, pk: PKAPI): boolean {
     if (!isPk(message)) return false;
-    if (["[]", "{}", undefined].includes(localSystemJson)) return false;
+    if ([[], {}, undefined].includes(localSystem)) return false;
 
     const authorMemberID: string = getAuthorOfMessage(message, pk);
     return (localSystem??[]).map(author => author.member.id).some(id => id === authorMemberID);
@@ -71,7 +70,7 @@ export function replaceTags(content: string, message: Message, localSystemData: 
 
 export async function loadAuthors() {
     authors = await DataStore.get<Record<string, Author>>(DATASTORE_KEY) ?? {};
-    localSystem = JSON.parse(localSystemJson = settings.store.data) ?? {};
+    localSystem = JSON.parse(settings.store.data) ?? {};
     localSystemNames = localSystem.map(author => author.member.display_name??author.member.name);
 }
 
