@@ -37,6 +37,7 @@ import { Message } from "discord-types/general";
 import { PKAPI } from "./api";
 import pluralKit from "./index";
 import {
+    Author,
     deleteMessage,
     getAuthorOfMessage,
     isOwnPkMessage,
