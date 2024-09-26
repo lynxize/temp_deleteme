@@ -39,7 +39,8 @@ export function isOwnPkMessage(message: Message, pk: PKAPI): boolean {
     if (!isPk(message)) return false;
     if (["[]", "{}", undefined].includes(localSystemJson)) return false;
 
-    return (localSystem??[]).map(author => author.member.id).some(id => id === getAuthorOfMessage(message, pk).member.id);
+    const authorMemberID: string = getAuthorOfMessage(message, pk);
+    return (localSystem??[]).map(author => author.member.id).some(id => id === authorMemberID);
 }
 
 export function replaceTags(content: string, message: Message, localSystemData: string, pk: PKAPI) {
