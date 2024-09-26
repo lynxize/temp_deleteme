@@ -46,8 +46,9 @@ export function replaceTags(content: string, message: Message, localSystemData: 
     const author = getAuthorOfMessage(message, pk);
     const localSystem: Author[] = JSON.parse(localSystemData);
 
-    const systemSettings: SystemGuildSettings = author.systemSettings[ChannelStore.getChannel(message.channel_id).guild_id];
-    const memberSettings: MemberGuildSettings = author.guildSettings[ChannelStore.getChannel(message.channel_id).guild_id];
+    const messageGuildID = ChannelStore.getChannel(message.channel_id).guild_id;
+    const systemSettings: SystemGuildSettings = author.systemSettings[messageGuildID];
+    const memberSettings: MemberGuildSettings = author.guildSettings[messageGuildID];
     const { system } = author;
 
     // prioritize guild settings, then system/member settings
