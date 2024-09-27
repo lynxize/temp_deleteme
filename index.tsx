@@ -126,7 +126,7 @@ export const settings = definePluginSettings({
     colorNames: {
         type: OptionType.BOOLEAN,
         description: "Display member colors in their names in chat",
-        default: false
+        default: true
     },
     pkIcon: {
         type: OptionType.BOOLEAN,
@@ -289,16 +289,17 @@ export default definePlugin({
         const prefix = isRepliedMessage && withMentionPrefix ? "@" : "";
         try {
             const discordUsername = author.nick??author.displayName??author.username;
-            if (!isPk(message) || !settings.store.colorNames) {
+
+            if (!isPk(message) || !settings.store.colorNames)
                 return <>{prefix}{discordUsername}</>;
-            }
+
+            const pkAuthor = getAuthorOfMessage(message, pluralKit.api);
+            if (!pkAuthor)
+                return <>{prefix}{discordUsername}</>;
 
             let color: string = "666666";
-            const pkAuthor = getAuthorOfMessage(message, pluralKit.api);
 
-            if (pkAuthor.member) {
-                color = pkAuthor.member.color ?? pkAuthor.system.color ?? color;
-            }
+            color = pkAuthor.member?.color ?? pkAuthor.system?.color ?? color;
 
             const display = isOwnPkMessage(message, pluralKit.api) && settings.store.displayLocal !== "" ? settings.store.displayLocal : settings.store.displayOther;
             const resultText = replaceTags(display, message, settings.store.data, pluralKit.api);
