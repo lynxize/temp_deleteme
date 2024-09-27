@@ -201,7 +201,7 @@ export default definePlugin({
             find: ".hasAvatarForGuild(null==",
             replacement: {
                 match: /return\(0/,
-                replace: "if(v){v._userProfile.pronouns=$self.tryGetPkPronouns();v._userProfile.bio=$self.tryGetPkBio();v.bio=$self.tryGetPkBio()}$&"
+                replace: "if(v){v.bio=$self.tryGetPkBio();}$&"
             }
         },
         {
@@ -215,35 +215,7 @@ export default definePlugin({
             find: "getRelationshipType(t.id):",
             replacement: {
                 match: /user:t/,
-                replace: "user:$self.getUserPopoutMessageSender() ?? t"
-            }
-        },
-        {
-            find: "getRelationshipType(t.id):",
-            replacement: {
-                match: /onClose:t/,
-                replace: "onClose:$self.getUserPopoutMessageSender() ?? t"
-            }
-        },
-        {
-            find: "getRelationshipType(t.id):",
-            replacement: {
-                match: /userId:t.id/,
-                replace: "userId:$self.getUserPopoutMessageSender()?.id ?? t.id"
-            }
-        },
-        {
-            find: "getRelationshipType(t.id):",
-            replacement: {
-                match: /:t\.id/,
-                replace: ":$self.getUserPopoutMessageSender()?.id ?? t.id"
-            }
-        },
-        {
-            find: "getRelationshipType(t.id):",
-            replacement: {
-                match: /getRelationshipType\(t\.id\)/,
-                replace: "getRelationshipType($self.getUserPopoutMessageSender()?.id ?? t.id)"
+                replace: "t=$self.getUserPopoutMessageSender() ?? e.user"
             }
         },
         {
