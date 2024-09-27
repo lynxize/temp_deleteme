@@ -121,15 +121,12 @@ export function getAuthorOfMessage(message: Message, pk: PKAPI) {
     const authorData = generateAuthorData(message);
     let author: Author = authors[authorData]??undefined;
 
-    if (author) {
-        authors[authorData] = author;
-        DataStore.set(DATASTORE_KEY, authors);
+    if (author)
         return author;
-    }
 
     pk.getMessage({ message: message.id }).then(msg => {
         if (!msg.member)
-            throw new TypeError("Mesage did not have an associated author!");
+            throw new TypeError("Message did not have an associated author!");
 
         author = ({ member: msg.member as Member, system: msg.system as System, systemSettings: new Map(), guildSettings: new Map() });
 
@@ -159,8 +156,10 @@ export function getAuthorOfMessage(message: Message, pk: PKAPI) {
 
         authors[authorData] = author;
         DataStore.set(DATASTORE_KEY, authors);
+    }).catch(e => {
+        throw e;
     });
 
-    return authors[authorData];
+    return undefined;
 }
 
