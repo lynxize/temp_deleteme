@@ -46,14 +46,12 @@ export function replaceTags(content: string, message: Message, localSystemData: 
     const localSystem: Author[] = JSON.parse(localSystemData);
 
     const messageGuildID = ChannelStore.getChannel(message.channel_id).guild_id;
-    const systemSettings: SystemGuildSettings = author.systemSettings[messageGuildID];
-    const memberSettings: MemberGuildSettings = author.guildSettings[messageGuildID];
     const { system } = author;
 
     // prioritize guild settings, then system/member settings
-    const { tag } = systemSettings ?? system;
-    const name = memberSettings?.display_name || (author.member.display_name??author.member.name);
-    const avatar = memberSettings ? memberSettings.avatar_url : author.member.avatar;
+    const { tag } = system;
+    const name = author.member.display_name ?? author.member.name;
+    const avatar = author.member.avatar;
 
     return content
         .replace(/{tag}/g, tag??"")
@@ -134,28 +132,6 @@ export function getAuthorOfMessage(message: Message, pk: PKAPI) {
         author = ({ member: msg.member as Member, system: msg.system as System, systemSettings: new Map(), guildSettings: new Map() });
 
         const messageGuildID = ChannelStore.getChannel(msg.channel).guild_id;
-
-        try {
-            author.member.getGuildSettings(messageGuildID).then(guildSettings => {
-                author.guildSettings.set(messageGuildID, guildSettings);
-            });
-        } catch (e) {
-            if (!(e instanceof AxiosError))
-                throw(e);
-
-            author.guildSettings.set(messageGuildID, new MemberGuildSettings(pk, {}));
-        }
-
-        try {
-            author.system.getGuildSettings(messageGuildID).then(guildSettings => {
-                author.systemSettings.set(messageGuildID, guildSettings);
-            });
-        } catch (e) {
-            if (!(e instanceof AxiosError))
-                throw(e);
-
-            author.systemSettings.set(messageGuildID, new SystemGuildSettings(pk, {}));
-        }
 
         authors[authorData] = author;
         DataStore.set(DATASTORE_KEY, authors);
