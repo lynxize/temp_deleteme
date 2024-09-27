@@ -30,7 +30,7 @@ import {
     ChannelStore,
     Menu,
     MessageActions,
-    MessageStore, UserProfileStore, UserStore
+    MessageStore, UserStore
 } from "@webpack/common";
 import { Message } from "discord-types/general";
 
