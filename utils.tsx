@@ -43,6 +43,10 @@ export function isOwnPkMessage(message: Message, pk: PKAPI): boolean {
 
 export function replaceTags(content: string, message: Message, localSystemData: string, pk: PKAPI) {
     const author = getAuthorOfMessage(message, pk);
+
+    if (!author?.member)
+        throw new TypeError("The member who wrote this message cannot be found! Were they deleted?");
+
     const localSystem: Author[] = JSON.parse(localSystemData);
 
     const messageGuildID = ChannelStore.getChannel(message.channel_id).guild_id;
@@ -119,25 +123,17 @@ export function getAuthorOfMessage(message: Message, pk: PKAPI) {
     const authorData = generateAuthorData(message);
     let author: Author = authors[authorData]??undefined;
 
-    if (author)
+    if (author != undefined)
         return author;
 
-    if (authors[authorData] == null)
-        return;
+    if (author === null)
+        return null;
 
     pk.getMessage({ message: message.id }).then(msg => {
-        if (!msg.member)
-            throw new TypeError("Message did not have an associated author!");
-
         author = ({ member: msg.member as Member, system: msg.system as System, systemSettings: new Map(), guildSettings: new Map() });
-
-        const messageGuildID = ChannelStore.getChannel(msg.channel).guild_id;
 
         authors[authorData] = author;
         DataStore.set(DATASTORE_KEY, authors);
-    }).catch(e => {
-        authors[authorData] = author;
-        throw e;
     });
 
     authors[authorData] = null;
