@@ -22,7 +22,8 @@ function AxiosRateLimit (axios) {
 
     this.rateLimitLimit = 2;
     this.rateLimitRemaining = 2;
-    this.rateLimitReset = Date.now();
+    this.rateLimitReset = 0;
+    this.rateLimitBurst = 10;
 
 	this.enable(axios);
 }
@@ -75,19 +76,17 @@ AxiosRateLimit.prototype.handleRequest = function (request) {
 
 AxiosRateLimit.prototype.handleResponse = function (response) {
     try {
-        // Since we don't have high precision, add 500ms of extra time within each timespan
-        var rateLimitReset = (+response.headers['x-ratelimit-reset'] * 1000 + 1000) ?? this.rateLimitReset;
+        var rateLimitReset = (+response.headers['x-ratelimit-reset']) ?? this.rateLimitReset;
 
-        if (rateLimitReset >= this.rateLimitReset) {
+        // Only accept messages newer than the previous message
+        if (rateLimitReset > this.rateLimitReset) {
             this.rateLimitReset = rateLimitReset;
 
             this.rateLimitLimit = +response.headers['x-ratelimit-limit'] ?? this.rateLimitLimit;
 
-            /*var rateLimitRemaining = +response.headers['x-ratelimit-remaining'] ?? 0;
-            // PluralKit does some weird math with the rate limit. This undoes it.
-            rateLimitRemaining += (5 - this.rateLimitLimit);
-
-            this.rateLimitRemaining = Math.min(rateLimitRemaining, this.rateLimitRemaining);*/
+            // PluralKit does some weird math with the rate limit, so we have to undo it
+            this.rateLimitRemaining = +response.headers['x-ratelimit-remaining'] ?? 0;
+            this.rateLimitRemaining += (this.rateLimitBurst - this.rateLimitLimit);
         }
     } catch (e) {
         console.error(e);
@@ -118,29 +117,20 @@ AxiosRateLimit.prototype.shift = function () {
             return;
         }
 
-        this.tryStartTimeslot();
-        if (!this.tryEndTimeslot()) {
+        this.startTimeout();
+
+        if (this.rateLimitRemaining <= 0) {
             this.shifting = false;
             return;
         }
 
         var queued = this.queue.shift();
-        this.rateLimitRemaining -= 1;
         var resolved = queued.resolve();
-
-        this.shift();
+        this.rateLimitRemaining -= 1;
     } catch (e) {
         console.error(e);
         this.shifting = false;
     }
-}
-
-AxiosRateLimit.prototype.tryEndTimeslot = function () {
-	if (this.rateLimitRemaining <= 0)
-        return false;
-
-    this.startTimeout();
-    return true;
 }
 
 AxiosRateLimit.prototype.startTimeout = function () {
@@ -150,17 +140,17 @@ AxiosRateLimit.prototype.startTimeout = function () {
     if (this.timeoutId != undefined && this.timeoutId != null)
         return;
 
+    const timeoutBase = 1000 / this.rateLimitLimit;
+    const timeoutOffset = (timeoutBase / 30) * (this.rateLimitRemaining - (this.rateLimitBurst * 0.65));
+
     this.timeoutId = setTimeout(function () {
         this.timeoutId = null;
 
-        this.rateLimitRemaining = Math.max(1,Math.floor((this.rateLimitLimit - 1) / 4) * 2);
-
-        if (this.rateLimitReset <= Date.now()) {
-            this.rateLimitReset = Date.now() + 1000;
-        }
+        this.rateLimitRemaining += 1;
 
         this.shift();
-    }.bind(this), Math.max(0, this.nextSlotDelta() + 100));
+
+    }.bind(this), timeoutBase - timeoutOffset);
 }
 
 AxiosRateLimit.prototype.stopTimeout = function () {
@@ -172,20 +162,6 @@ AxiosRateLimit.prototype.stopTimeout = function () {
 
     clearTimeout(this.timeoutId);
     this.timeoutId = null;
-}
-
-AxiosRateLimit.prototype.tryStartTimeslot = function () {
-	//if (this.rateLimitRemaining != this.rateLimitLimit)
-    //    return false;
-
-    this.startTimeout();
-
-    return true;
-}
-
-AxiosRateLimit.prototype.nextSlotDelta = function() {
-    const ret = this.rateLimitReset - Date.now();
-    return ret;
 }
 
 /**
