@@ -255,7 +255,8 @@ export default definePlugin({
 
         userPopoutMessage = message;
         pluralKit.api.getMessage({ message: message.id }).then(msg => {
-            userPopoutMessageSender = UserStore.getUser(msg.sender);
+            const sender = msg.sender ?? message.author.id;
+            userPopoutMessageSender = UserStore.getUser(sender);
         });
     },
 
