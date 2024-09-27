@@ -167,13 +167,13 @@ export const settings = definePluginSettings({
             }}>Print Data</Button>;
         },
         description: "Print stored data to console",
-        hidden: IS_DEV // showDebug
+        hidden: !IS_DEV // showDebug
     },
     data: {
         type: OptionType.STRING,
         description: "Datastore",
         default: "{}",
-        hidden: IS_DEV // showDebug
+        hidden: !IS_DEV // showDebug
     }
 });
 
