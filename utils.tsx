@@ -124,6 +124,9 @@ export function getAuthorOfMessage(message: Message, pk: PKAPI) {
     if (author)
         return author;
 
+    if (authors[authorData] == null)
+        return;
+
     pk.getMessage({ message: message.id }).then(msg => {
         if (!msg.member)
             throw new TypeError("Message did not have an associated author!");
@@ -157,8 +160,11 @@ export function getAuthorOfMessage(message: Message, pk: PKAPI) {
         authors[authorData] = author;
         DataStore.set(DATASTORE_KEY, authors);
     }).catch(e => {
+        authors[authorData] = author;
         throw e;
     });
+
+    authors[authorData] = null;
 
     return undefined;
 }
