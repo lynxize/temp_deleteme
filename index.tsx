@@ -291,24 +291,34 @@ export default definePlugin({
         try {
             const discordUsername = author.nick??author.displayName??author.username;
 
-            if (!isPk(message) || !settings.store.colorNames)
+            if (!isPk(message))
+                return <>{prefix}{discordUsername}</>;
+
+            // PK mesasage, disable bot tag
+            if (decorations)
+                decorations[0] = null;
+            message.bot = false;
+            message.author.bot = false;
+
+            if (!settings.store.colorNames)
                 return <>{prefix}{discordUsername}</>;
 
             const pkAuthor = getAuthorOfMessage(message, pluralKit.api);
-            if (!pkAuthor)
-                return <>{prefix}{discordUsername}</>;
 
-            let color: string = "666666";
+            // A PK message without an author. It's likely still loading
+            if (!pkAuthor)
+                return <span style={{color: '#555555'}}>{prefix}{discordUsername}</span>;
+
+            // A PK message that contains an author but no member, meaning the member was likely deleted
+            if (!pkAuthor.member)
+                return <span style={{color: '#9A2D22'}}>{prefix}{discordUsername}</span>;
+
+            let color: string = "888888";
 
             color = pkAuthor.member?.color ?? pkAuthor.system?.color ?? color;
 
             const display = isOwnPkMessage(message, pluralKit.api) && settings.store.displayLocal !== "" ? settings.store.displayLocal : settings.store.displayOther;
             const resultText = replaceTags(display, message, settings.store.data, pluralKit.api);
-
-            // PK mesasage, disable bot tag
-            decorations[0] = null;
-            message.bot = false;
-            message.author.bot = false;
 
             return <span style={{color: `#${color}`}}>{resultText}</span>;
         } catch (e) {
