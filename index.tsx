@@ -39,6 +39,7 @@ import pluralKit from "./index";
 import {
     Author,
     deleteMessage,
+    enforceMinLightness,
     getAuthorOfMessage,
     isOwnPkMessage,
     isPk,
@@ -127,6 +128,11 @@ export const settings = definePluginSettings({
         type: OptionType.BOOLEAN,
         description: "Display member colors in their names in chat",
         default: true
+    },
+    adjustColors: {
+        type: OptionType.BOOLEAN,
+        description: "Adjust member colors for readability",
+        default: false
     },
     pkIcon: {
         type: OptionType.BOOLEAN,
@@ -316,6 +322,8 @@ export default definePlugin({
             let color: string = "888888";
 
             color = pkAuthor.member?.color ?? pkAuthor.system?.color ?? color;
+
+            if (settings.store.adjustColors) color = enforceMinLightness(color, 70);
 
             const display = isOwnPkMessage(message, pluralKit.api) && settings.store.displayLocal !== "" ? settings.store.displayLocal : settings.store.displayOther;
             const resultText = replaceTags(display, message, settings.store.data, pluralKit.api);
